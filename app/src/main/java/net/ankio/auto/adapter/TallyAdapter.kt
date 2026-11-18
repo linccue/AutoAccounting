@@ -86,7 +86,10 @@ class TallyAdapter : IAppAdapter {
             putString("remark", billInfoModel.remark)
             if (category.isNotEmpty()) putString("catename", category)
             if (billInfoModel.bookName.isNotEmpty()) putString("bookname", billInfoModel.bookName)
-            if (billInfoModel.currency.isNotEmpty()) putString("currency", billInfoModel.currency)
+            // currency 字段里存的是 CurrencyModel 的 JSON（{"code":"CNY",...}），
+            // 直接透传会让 Tally 把 "CNY" 以外的一切都当成外币拒掉，这里只送币种代码。
+            val currencyCode = billInfoModel.currencyCode()
+            if (!currencyCode.equals("CNY", ignoreCase = true)) putString("currency", currencyCode)
             if (billInfoModel.id > 0) putString("id", "ankio-${billInfoModel.id}")
         }
 
